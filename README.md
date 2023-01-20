@@ -169,11 +169,11 @@ mkdir -p usr/local/bin/pysel/Event_checks
 cd /home/ubuntu
 apt-get update -y -qq
 apt install git -y -qq
-git clone https://github.com/lovebarnowls/completeimage2.git
-cd /home/ubuntu/completeimage2
-mv /home/ubuntu/completeimage2/score.py /usr/local/bin/pysel/
-mv /home/ubuntu/completeimage2/pysel.py /usr/local/bin/pysel/
-mv /home/ubuntu/completeimage2/Event_checks/* /usr/local/bin/pysel/Event_checks/
+git clone https://github.com/lovebarnowls/pysel.git
+cd /home/ubuntu/pysel
+mv /home/ubuntu/pysel/score.py /usr/local/bin/pysel/
+mv /home/ubuntu/pysel/pysel.py /usr/local/bin/pysel/
+mv /home/ubuntu/pysel/Event_checks/* /usr/local/bin/pysel/Event_checks/
 chmod a+x inject.sh
 ./inject.sh -y -qq
 chmod a+x install.sh
