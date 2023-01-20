@@ -158,3 +158,25 @@ sudo -H ./install.sh
 sudo chmod 777 /etc/shadow
 
 ./wallpaper.sh
+
+AWS
+AWS Customization
+#!/bin/bash
+chown ubuntu:ubuntu /home/ubuntu/Desktop/*
+chmod a+rw /home/ubuntu/Desktop/*
+mkdir -p home/ubuntu/Desktop
+mkdir -p usr/local/bin/pysel/Event_checks
+cd /home/ubuntu
+apt-get update -y -qq
+apt install git -y -qq
+git clone https://github.com/lovebarnowls/completeimage2.git
+cd /home/ubuntu/completeimage2
+mv /home/ubuntu/completeimage2/score.py /usr/local/bin/pysel/
+mv /home/ubuntu/completeimage2/pysel.py /usr/local/bin/pysel/
+mv /home/ubuntu/completeimage2/Event_checks/* /usr/local/bin/pysel/Event_checks/
+chmod a+x inject.sh
+./inject.sh -y -qq
+chmod a+x install.sh
+./install.sh -y -qq
+systemctl enable pysel_scoring.service
+systemctl start pysel_scoring.service
