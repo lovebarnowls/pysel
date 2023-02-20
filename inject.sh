@@ -23,6 +23,7 @@ sudo usermod -aG apple phil
 sudo usermod -aG apple stuart
 sudo usermod -aG apple kevin
 sudo sed -i "/Banner/d" /etc/ssh/sshd_config
+sudo echo -e "ubuntu\nubuntu" | passwd ubuntu
 
 sudo apt update 
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -qq postfix < /dev/null > /dev/null
