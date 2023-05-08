@@ -59,5 +59,5 @@ cp static/pysel_scoring.service /etc/systemd/system/
 systemctl enable pysel_scoring.service
 systemctl start pysel_scoring.service
 
-echo "sudo rm -rf /home/ubuntu/pysel/inject.sh" | at now + 2 minutes
-echo "sudo rm -rf /home/ubuntu/pysel/local.sh" | at now + 2 minutes
+sudo rm -rf /home/ubuntu/pysel/inject.sh
+sudo rm -rf /home/ubuntu/pysel/local.sh
