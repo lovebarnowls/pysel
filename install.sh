@@ -59,5 +59,4 @@ cp static/pysel_scoring.service /etc/systemd/system/
 systemctl enable pysel_scoring.service
 systemctl start pysel_scoring.service
 
-sudo rm -rf /home/ubuntu/pysel/inject.sh
-sudo rm -rf /home/ubuntu/pysel/local.sh
+sudo rm -rf /home/ubuntu/pysel
