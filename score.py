@@ -358,7 +358,7 @@ class Pysel:
         run_loop = True
         webhook_url = 'https://script.google.com/macros/s/AKfycbx8-hh2Ive9cm3yqu5XRlNGfYLYtD-jET3j4WuZxWfptAiepHAs_FmYJ3lngIMiNALd/exec'
         machine_id = socket.gethostbyname(socket.gethostname())
-        sendout = f"Image: 16B\nMachine ID: {machine_id}\nCurrenttotal: {initialScore}\nScore: {score}\nEvent: {event}\nParameter: {parameter}\nTag: {tag}"
+        sendout = f"Image: 17A\nMachine ID: {machine_id}\nCurrenttotal: {initialScore}\nScore: {score}\nEvent: {event}\nParameter: {parameter}\nTag: {tag}"
 #remove Currenttotal:initialScore if not working
         data = {
             'text': sendout
