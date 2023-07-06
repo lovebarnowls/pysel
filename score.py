@@ -276,30 +276,12 @@ import requests
 from collections import OrderedDict
 import os
 import io
+import socket
 
 DEBUG = False
 scoreReportLocation = ''
 teamIdLocation = '/usr/local/bin/pysel/TEAM'
 
-## Dump your config here in order to test without installing
-"""
-s_config = 
-[General:Options]
-debug = yes
-scoreReportLocation = /home/ubuntu/Desktop/ScoreReport.html
-remoteReportingenabled = no
-remoteReportingServer = http://cybertaipan.mensa.org.au
-remoteReportingRound = Training Round
-timeLimit = 150
-
-[10-DisableGuestEtc:Secure_lightdm]
-enabled = yes
-tag = User Management
-pointValue = 5
-parameters = allow-guest greeter-hide-users greeter-show-manual-login
-description = 
-msg = Guest account has been disabled
-"""
 
 class Pysel:
 
@@ -307,8 +289,7 @@ class Pysel:
         buf = io.StringIO(s_file)
         config_parser = configparser.ConfigParser()
         config_parser.read_file(buf)
-#        config_parser = configparser.ConfigParser()
-#        config_parser.read(buf)
+
        
         team_config = configparser.ConfigParser()
         team_config.read(team_conf)
@@ -351,10 +332,10 @@ class Pysel:
 
     def draw_html_head(self, team, round):
         f = open(self.general['General:Options']['scorereportlocation'], 'w')
-        f.write('<!DOCTYPE html><html lang="en">\n<head><title>PySEL Score Report</title><meta http-equiv="refresh" content="40"></head>\n<body><table align="center"><tr><td><img src="/cyberpatriot/cplogo.png"></td><td><div align="center"><H1>Mensa</H1><H5>2022 Final Team training image</H5></div></td><td><img src="/cyberpatriot/eoclogo.jpeg"</td></tr></table><br><hr><br><table border="1"; align="center"><tr><td colspan=3><div align="center"><b>Team: ' + team + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Round: ' + round + '</b></div></td></tr><tr><td>Pts</td><td>Event</td><td>Tag</td></tr>\n')
+        f.write('<!DOCTYPE html><html lang="en">\n<head><title>PySEL Score Report</title><meta http-equiv="refresh" content="40"></head>\n<body><table align="center"><tr><td><div align="center"><H1>Cybersecurity Training</H1><H5>17A</H5></div></td></tr></table><br><hr><br><table border="1"; align="center"><tr><td colspan=3><div align="center"><b>Team: ' + team + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Round: ' + round + '</b></div></td></tr><tr><td>Pts</td><td>Event</td><td>Tag</td></tr>\n')
         f.close()
-
-    def update_html_body(self, score, event, parameter, tag):
+#remove initialScore if not working
+    def update_html_body(self, score, event, parameter, initialScore, tag):
         if '%PARAMETER%' not in event:
           reportedEvent = event
         else:
@@ -372,6 +353,29 @@ class Pysel:
         f.write(payload)
         f.write('\n')
         f.close()
+        
+        # Send data to the webhook URL
+        run_loop = True
+        webhook_url = 'https://script.google.com/macros/s/AKfycbx8-hh2Ive9cm3yqu5XRlNGfYLYtD-jET3j4WuZxWfptAiepHAs_FmYJ3lngIMiNALd/exec'
+        machine_id = socket.gethostbyname(socket.gethostname())
+        sendout = f"Image: 16B\nMachine ID: {machine_id}\nCurrenttotal: {initialScore}\nScore: {score}\nEvent: {event}\nParameter: {parameter}\nTag: {tag}"
+#remove Currenttotal:initialScore if not working
+        data = {
+            'text': sendout
+        }
+        
+        while run_loop:
+            try:
+                response = requests.post(webhook_url, json=data)
+                response.raise_for_status()
+            except requests.exceptions.RequestException as e:
+                print("Error sending webhook request:", e)
+            if run_loop:
+                run_loop = False
+                time.sleep(1)
+            else:
+                run_loop = True
+                time.sleep(119)
 
     def get_team_id(self, teamIdLocation):
         if os.path.exists(teamIdLocation):
@@ -381,13 +385,14 @@ class Pysel:
             team = '<font color="red">NO TEAM!</font>'
         return (team)
 
+
     def draw_html_tail(self, currentScore, totalScore):
         f = open(self.general['General:Options']['scorereportlocation'], 'a')
         payload = '</table><div align="center"><br><H3>Total Score: ' + currentScore + ' out of ' + totalScore + '</H3></div><hr><br>\n<div align="center">Last updated: ' + str(time.ctime()) + '</div></body></html>'
         f.write(payload)
         f.close()
-
-
+        
+        
     def send_notification(self):
         pass
 
@@ -398,11 +403,6 @@ class Pysel:
         initialScore = 0
         while True:
             self.draw_html_head(self.get_team_id(teamIdLocation), self.general['General:Options']['remotereportinground'])
-            # print('     +------------------------------+')
-            # print('     |      PySEL Score Report      |')
-            # print('     |       ' + self.general['General:Options']['remotereportinground'] + "        |")
-            # print('     +------------------------------+')
-
             self.currentScore = 0
             for name, event in self.sortedEvents.items():
             
@@ -416,23 +416,19 @@ class Pysel:
                         if eval("Event_checks."+name.split(":")[1]+"(parameter)"):
                             print('[X] ',event['pointvalue'], 'pts for',event['tag'], parameter)
                             self.currentScore += int(event['pointvalue'])
-                            self.update_html_body(event['pointvalue'], event['msg'], parameter, event['tag'])
+                            self.update_html_body(event['pointvalue'], event['msg'], parameter, self.currentScore, event['tag'])
+
                         else:
                             if DEBUG == True and int(event['pointvalue']) > 0:
                                     self.update_html_body('MISS', event['msg'], parameter, event['tag'])
                                     print("[ ]  0 pts for",event['msg'], parameter)
             
-            ## Did we gain or lose points?
-            if initialScore < self.currentScore:
-                print("_____I LIKE YOUR STYLE!____")
-                self.play_noise('/cyberpatriot/gain.wav')
-            elif initialScore > self.currentScore:
-                print("_____YOU DISGUST ME!____")
-                self.play_noise('/cyberpatriot/lose.wav')
 
+            
             initialScore = self.currentScore
             print('Current score: {} out of {}'.format(self.currentScore, self.possibleScore))
             self.draw_html_tail(str(self.currentScore), str(self.possibleScore))
+         
 
             if self.general['General:Options']['remotereportingenabled'] == "yes":
                 url = self.general['General:Options']['remotereportingserver']
