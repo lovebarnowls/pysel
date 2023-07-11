@@ -357,8 +357,15 @@ class Pysel:
         # Send data to the webhook URL
         run_loop = True
         webhook_url = 'https://script.google.com/macros/s/AKfycbx8-hh2Ive9cm3yqu5XRlNGfYLYtD-jET3j4WuZxWfptAiepHAs_FmYJ3lngIMiNALd/exec'
+        
         machine_id = socket.gethostbyname(socket.gethostname())
-        sendout = f"Image: 17A\nMachine ID: {machine_id}\nCurrenttotal: {initialScore}\nScore: {score}\nEvent: {event}\nParameter: {parameter}\nTag: {tag}"
+        imagename = '17A'
+        file_path = "/home/ubuntu/Desktop/teamname.txt"
+        with open(file_path, "r") as file:
+            line = file.readline().replace("\n", "").replace("\r", "").replace(" ", "")
+            machine_id2 = line.split(":")[1].split(" ")[0]
+
+        sendout = f"Image: {imagename}\nMachine ID: {machine_id2}\nCurrenttotal: {initialScore}\nScore: {score}\nEvent: {event}\nParameter: {parameter}\nTag: {tag}\nIP: {machine_id}"
 #remove Currenttotal:initialScore if not working
         data = {
             'text': sendout
@@ -368,6 +375,7 @@ class Pysel:
             try:
                 response = requests.post(webhook_url, json=data)
                 response.raise_for_status()
+             
             except requests.exceptions.RequestException as e:
                 print("Error sending webhook request:", e)
             if run_loop:
@@ -376,6 +384,7 @@ class Pysel:
             else:
                 run_loop = True
                 time.sleep(119)
+
 
     def get_team_id(self, teamIdLocation):
         if os.path.exists(teamIdLocation):
