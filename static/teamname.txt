@@ -1,0 +1,1 @@
+Name of team [SingleWord, No Spaces, Renove <Carets>]: <teamname>
