@@ -1,5 +1,4 @@
-Note: Users on AWS may need to run the following code if they don't have permissions to write files etc:
-sudo -i
+Please update your team name in teamname.txt. Make sure there are NO SPACES and document has only ONE line.
 
 
 
