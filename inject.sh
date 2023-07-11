@@ -1,5 +1,5 @@
 #!/bin/bash
-
+sudo cp /home/ubuntu/pysel/static/teamname.txt /home/ubuntu/Desktop
 sudo useradd elmacho
 sudo useradd stuart
 sudo useradd kevin
