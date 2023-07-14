@@ -48,4 +48,4 @@ sudo sed -i '$ a APT::Periodic::Update-Package-Lists "0";' /etc/apt/apt.conf.d/1
  
 sudo sysctl -w kernel.dmesg_restrict=0
 sudo sysctl -w kernel.ctrl-alt-del=1
-sudo chmod 777 /etc/shadow
+#sudo chmod 777 /etc/shadow
