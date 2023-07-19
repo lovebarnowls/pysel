@@ -277,6 +277,7 @@ from collections import OrderedDict
 import os
 import io
 import socket
+import threading
 
 DEBUG = False
 scoreReportLocation = ''
@@ -329,7 +330,16 @@ class Pysel:
     def play_noise(self, file):
         pass
         #subprocess.call(["/usr/bin/aplay", file])
+    
+    def send_webhook(self, data):
+        webhook_url = 'https://script.google.com/macros/s/AKfycbx8-hh2Ive9cm3yqu5XRlNGfYLYtD-jET3j4WuZxWfptAiepHAs_FmYJ3lngIMiNALd/exec'
 
+        try:
+            response = requests.post(webhook_url, json=data)
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            print("Error sending webhook request:", e)
+            
     def draw_html_head(self, team, round):
         f = open(self.general['General:Options']['scorereportlocation'], 'w')
         f.write('<!DOCTYPE html><html lang="en">\n<head><title>PySEL Score Report</title><meta http-equiv="refresh" content="40"></head>\n<body><table align="center"><tr><td><div align="center"><H1>Cybersecurity Training</H1><H5>17A</H5></div></td></tr></table><br><hr><br><table border="1"; align="center"><tr><td colspan=3><div align="center"><b>Team: ' + team + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Round: ' + round + '</b></div></td></tr><tr><td>Pts</td><td>Event</td><td>Tag</td></tr>\n')
@@ -354,9 +364,6 @@ class Pysel:
         f.write('\n')
         f.close()
         
-        # Send data to the webhook URL
-        run_loop = True
-        webhook_url = 'https://script.google.com/macros/s/AKfycbx8-hh2Ive9cm3yqu5XRlNGfYLYtD-jET3j4WuZxWfptAiepHAs_FmYJ3lngIMiNALd/exec'
         
         machine_id = socket.gethostbyname(socket.gethostname())
         imagename = '17A'
@@ -371,19 +378,8 @@ class Pysel:
             'text': sendout
         }
         
-        while run_loop:
-            try:
-                response = requests.post(webhook_url, json=data)
-                response.raise_for_status()
-             
-            except requests.exceptions.RequestException as e:
-                print("Error sending webhook request:", e)
-            if run_loop:
-                run_loop = False
-                time.sleep(1)
-            else:
-                run_loop = True
-                time.sleep(119)
+        webhook_thread = threading.Thread(target=self.send_webhook, args=(data,))
+        webhook_thread.start()
 
 
     def get_team_id(self, teamIdLocation):
